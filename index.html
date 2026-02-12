@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent-pink: #ff4d6d;
+            --soft-pink: #fff0f3;
+            --glass: rgba(255, 255, 255, 0.85);
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #fce4ec 0%, #ffebee 100%);
+            font-family: 'Quicksand', sans-serif;
+            overflow-x: hidden;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .bg-layer {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            border-radius: 40px;
+            padding: 30px 20px;
+            text-align: center;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 20px 60px rgba(255, 77, 109, 0.15);
+            z-index: 10;
+            transition: all 0.5s ease;
+        }
+
+        .gif-container {
+            width: 100%;
+            height: 150px;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .gif-container img { border-radius: 20px; height: 100%; }
+
+        h1 {
+            font-family: 'Fredoka', sans-serif;
+            color: var(--accent-pink);
+            font-size: 1.8rem;
+            margin: 0 0 20px 0;
+        }
+
+        .menu-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .menu-card {
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            border: 3px solid transparent;
+            border-radius: 15px;
+            overflow: hidden;
+            background: white;
+            padding: 5px;
+        }
+
+        .menu-card:hover { transform: scale(1.05); border-color: var(--accent-pink); }
+        .menu-card img { width: 100%; border-radius: 10px; display: block; }
+        .menu-card p { font-size: 0.8rem; font-weight: bold; margin: 8px 0; color: #555; }
+
+        .btn-wrapper {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            position: relative;
+            height: 60px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        #yes-btn { background: var(--accent-pink); color: white; }
+        #no-btn { background: white; color: var(--accent-pink); border: 2px solid #ffcad4; }
+
+        .hidden { display: none !important; }
+
+        .date-info {
+            background: white;
+            padding: 20px;
+            border-radius: 25px;
+            border: 2px dashed var(--accent-pink);
+            margin-top: 20px;
+        }
+
+        .map-btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 25px;
+            background: #4cc9f0;
+            color: white;
+            text-decoration: none;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        #status-msg {
+            font-size: 0.7rem;
+            color: #999;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-layer" id="bg-layer"></div>
+
+    <div class="card" id="main-card">
+        <div class="gif-container">
+            <img id="display-gif" src="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExNGpsbmNqa2Rxb2Vrc3Vscnh3MGFuMm93YXZkb3JhcTFoZ2QzbmI5ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/cLS1cfxvGOPVpf9g3y/giphy.gif" alt="Cute Bear">
+        </div>
+
+        <div id="step-1">
+            <h1>Will you be my Valentine Esther? </h1>
+            <div class="btn-wrapper">
+                <button class="btn" id="yes-btn">Yes!</button>
+                <button class="btn" id="no-btn">No</button>
+            </div>
+        </div>
+
+        <div id="step-2" class="hidden">
+            <h1>Pick your favorite menu!</h1>
+            <div class="menu-options">
+                <div class="menu-card" onclick="selectMenu('Set 1')">
+                    <img src="pic1.jpg" alt="Menu 1">
+                    <p>Set 1</p>
+                </div>
+                <div class="menu-card" onclick="selectMenu('Set 2')">
+                    <img src="pic2.jpg" alt="Menu 2">
+                    <p>Set 2</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="step-3" class="hidden">
+            <h1 style="font-size: 2rem;">Yay! I love you! ❤️</h1>
+            <p id="choice-text" style="font-weight: bold; color: var(--accent-pink);"></p>
+            
+            <div class="date-info">
+                <span>📍 Pisa Old Market Restaurant</span>
+                <p style="font-size: 0.8rem; color: #999;">Okgna Ing Bun Hoaw, Phnom Penh</p>
+                <a href="https://maps.app.goo.gl/fnmPqb62FqtoykPY7" target="_blank" class="map-btn">Get Directions</a>
+                <p id="status-msg">Saving your choice to my heart... (and my list!)</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- GOOGLE FORM CONFIGURATION ---
+        // 1. Submit your form once manually and look at the URL. 
+        // 2. It will look like: https://docs.google.com/forms/u/0/d/e/[LONG-ID]/formResponse
+        const FORM_URL = "https://docs.google.com/forms/u/0/d/e/1FAIpQLSf9JugF9S3jE7x8UrwKNhClir8qSjyGWL1vqyEiG4E60fO2ug/formResponse";
+        
+        // 3. Find the entry ID (e.g., entry.123456789)
+        const ENTRY_ID = "entry.1057159115";
+        // ---------------------------------
+
+        const yesBtn = document.getElementById('yes-btn');
+        const noBtn = document.getElementById('no-btn');
+        const displayGif = document.getElementById('display-gif');
+        const step1 = document.getElementById('step-1');
+        const step2 = document.getElementById('step-2');
+        const step3 = document.getElementById('step-3');
+
+        function initBackground() {
+            const container = document.getElementById('bg-layer');
+            for(let i=0; i<15; i++) {
+                const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                svg.setAttribute("viewBox", "0 0 24 24");
+                svg.style.position = "absolute";
+                svg.style.width = (Math.random() * 20 + 20) + "px";
+                svg.style.left = Math.random() * 100 + "%";
+                svg.style.top = Math.random() * 100 + "%";
+                svg.style.opacity = "0.15";
+                svg.style.fill = "#ff4d6d";
+                svg.innerHTML = '<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>';
+                container.appendChild(svg);
+                svg.animate([{transform: 'translateY(0)'}, {transform: 'translateY(-40px)'}], {duration: 2000 + Math.random()*3000, iterations: Infinity, direction: 'alternate'});
+            }
+        }
+        initBackground();
+
+        noBtn.addEventListener('mouseover', () => {
+            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
+            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = x + 'px';
+            noBtn.style.top = y + 'px';
+        });
+
+        yesBtn.addEventListener('click', () => {
+            step1.classList.add('hidden');
+            step2.classList.remove('hidden');
+            displayGif.src = "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExY2V6MjZsZWYzcjVsNHBtOXBzdXVtY3liN2Roa2VwZXI3Nm01dHpjcyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/fh2lOwknIOuDZbtWDH/giphy.gif";
+        });
+
+        function selectMenu(choice) {
+            step2.classList.add('hidden');
+            step3.classList.remove('hidden');
+            document.getElementById('choice-text').innerText = "You chose: " + choice;
+            displayGif.src = "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExa29xbjUyNDFkbnY5cWV0bmZqYjViMTVpajBkaXY1Mjl0enY3azdyYyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/F7diD8tCkor5crWmtE/giphy.gif";
+            
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+
+            // SEND TO GOOGLE SHEETS VIA FORM
+            const formData = new FormData();
+            formData.append(ENTRY_ID, choice);
+
+            fetch(FORM_URL, {
+                method: "POST",
+                mode: "no-cors",
+                body: formData
+            }).then(() => {
+                document.getElementById('status-msg').innerText = "See you soon! ❤️";
+            }).catch(() => {
+                document.getElementById('status-msg').innerText = "Saved (locally)! See you soon! ❤️";
+            });
+        }
+    </script>
+</body>
+</html>
